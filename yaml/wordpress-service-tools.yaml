@@ -1,0 +1,10 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: wordpress-tools
+  namespace: tools
+spec:
+  type: ExternalName
+  externalName: wordpress.default.svc.cluster.local
+  ports:
+  - port: 80
