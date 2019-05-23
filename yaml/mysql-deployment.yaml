@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fuchicorp-mysql
+  labels:
+    app: fuchicorp
+spec:
+  selector:
+    matchLabels:
+      app: fuchicorp
+      tier: mysql
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: fuchicorp
+        tier: mysql
+    spec:
+      containers:
+      - image: fsadykov/centos_mysql
+        name: mysql
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-creds
+              key: MYSQL_ROOT_PASSWORD
+        - name: MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-creds
+              key: MYSQL_USER_PASSWORD
+        - name: MYSQL_USER
+          value: fuchicorp
+
+        - name: MYSQL_DATABASE
+          value: fuchicorp
+        ports:
+        - containerPort: 3306
+          name: mysql
+      volumes:
+        - name: mysql-local-storage
+          persistentVolumeClaim:
+            claimName: mysql-pv-claim

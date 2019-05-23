@@ -1,0 +1,2 @@
+variable "mysql_password" {
+}

@@ -1,0 +1,43 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: wordpress
+  labels:
+    app: wordpress
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wordpress
+  template:
+    metadata:
+      labels:
+        app: wordpress
+        tier: frontend
+    spec:
+      containers:
+        - image: wordpress:5.1.1-php7.1-apache
+          name: wordpress
+          env:
+          - name: WORDPRESS_DB_HOST
+            value: fuchicorp-mysql
+          - name: WORDPRESS_DB_USER
+            value: fuchicorp
+          - name: WORDPRESS_DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: mysql-creds
+                key: MYSQL_USER_PASSWORD
+          - name: WORDPRESS_DB_NAME
+            value: fuchicorp
+          ports:
+            - containerPort: 80
+              name: wordpress
+          volumeMounts:
+            - name: wordpress-local-storage
+              mountPath: /var/www/html
+      volumes:
+        - name: wordpress-local-storage
+          persistentVolumeClaim:
+            claimName: wp-lv-claim
